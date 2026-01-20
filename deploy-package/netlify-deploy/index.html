@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日行情 - 安佑预混料</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "San Francisco", "Roboto", "Helvetica Neue", Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+            padding: 15px 10px;
+            line-height: 1.4;
+        }
+
+        /* 顶部信息区 */
+        .header {
+            margin-bottom: 25px;
+        }
+
+        /* 顶部栏容器核心样式 */
+        .header-bar {
+            width: 100%;
+            height: 80px;
+            background-color: #8BC34A; /* 浅黄绿色背景 */
+            border-radius: 12px 0 0 12px; /* 左上、左下圆角12px，右侧直角 */
+            padding: 15px;
+            box-sizing: border-box; /* 内边距计入宽高 */
+            display: flex; /* Flex布局实现水平排列 */
+            align-items: center; /* 垂直居中 */
+            justify-content: space-between; /* 子元素两端分布 */
+            position: relative; /* 用于定位底部数据区 */
+            overflow: hidden; /* 防止内容溢出 */
+        }
+
+        /* Logo区域 */
+        .header-logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        .header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 保持Logo比例 */
+        }
+
+        /* 中间标题区域 */
+        .header-title {
+            text-align: center;
+            color: #FFFFFF; /* 白色文字 */
+            flex: 1; /* 占满剩余空间，实现居中 */
+        }
+        .main-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .sub-title {
+            font-size: 14px;
+            margin: 5px 0 0 0;
+            line-height: 1.2;
+        }
+
+        /* 右侧信息区域 */
+        .header-info {
+            color: #FFFFFF; /* 白色文字 */
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .date-text {
+            font-size: 14px;
+            margin: 0;
+        }
+        .update-text {
+            font-size: 12px;
+            margin: 3px 0 0 0;
+        }
+
+        /* 产品模块 */
+        .module {
+            margin-bottom: 25px;
+            padding: 12px 8px;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .product-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333333;
+        }
+
+        .unit {
+            font-size: 13px;
+            color: #666666;
+        }
+
+        .national-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .national-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #222222;
+        }
+
+        .national-change {
+            font-size: 14px;
+            color: #2e7d32;
+        }
+
+        .national-change.up {
+            color: #e53935;
+        }
+
+        .national-change.down {
+            color: #2e7d32;
+        }
+
+        .national-change.flat {
+            color: #000000;
+        }
+
+        .national-ratio {
+            font-size: 12px;
+            color: #2e7d32;
+        }
+
+        .national-ratio.up {
+            color: #e53935;
+        }
+
+        .national-ratio.down {
+            color: #2e7d32;
+        }
+
+        .national-ratio.flat {
+            color: #000000;
+        }
+
+        /* 区域数据网格 */
+        .region-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px 15px;
+        }
+
+        .region-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .region-name {
+            font-size: 14px;
+            color: #666666;
+        }
+
+        .region-price {
+            font-size: 14px;
+            color: #222222;
+        }
+
+        .region-change {
+            font-size: 13px;
+        }
+
+        .region-change.up {
+            color: #e53935;
+        }
+
+        .region-change.down {
+            color: #2e7d32;
+        }
+
+        .region-change.flat {
+            color: #000000;
+        }
+
+        /* 底部说明区域 */
+        .footer-section {
+            margin-top: 30px;
+            padding: 20px 10px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .data-explanation {
+            margin-bottom: 20px;
+        }
+
+        .explanation-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333333;
+            margin-bottom: 8px;
+        }
+
+        .explanation-text {
+            font-size: 12px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 6px;
+        }
+
+        .realtime-data {
+            margin-bottom: 20px;
+        }
+
+        .realtime-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333333;
+            margin-bottom: 8px;
+        }
+
+        .realtime-source {
+            font-size: 12px;
+            color: #666666;
+            line-height: 1.6;
+        }
+
+        .platform-description {
+            margin-bottom: 20px;
+        }
+
+        .description-text {
+            font-size: 12px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .publisher {
+            font-size: 12px;
+            color: #666666;
+        }
+
+        /* 底部导航栏 */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 15px 0;
+            border-top: 1px solid #e5e5e5;
+            position: sticky;
+            bottom: 0;
+            background-color: #ffffff;
+        }
+
+        .nav-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .nav-item span {
+            font-size: 14px;
+            color: #333333;
+            font-weight: normal;
+        }
+
+        .nav-item.active span {
+            color: #8BC34A;
+            font-weight: bold;
+        }
+
+        /* 响应式适配 - 手机端竖屏单列布局 */
+        @media (max-width: 374px) {
+            body {
+                padding: 15px 10px;
+            }
+
+            /* 顶部栏响应式调整 */
+            .header-bar {
+                height: 100px;
+                padding: 10px;
+            }
+
+            .header-logo {
+                width: 35px;
+                height: 35px;
+                margin-right: 10px;
+            }
+
+            .main-title {
+                font-size: 18px;
+            }
+
+            .sub-title {
+                font-size: 12px;
+            }
+
+            .header-info {
+                margin-left: auto;
+            }
+
+            .date-text {
+                font-size: 12px;
+            }
+
+            .update-text {
+                font-size: 10px;
+            }
+
+            /* 产品模块响应式 */
+            .module-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .product-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .product-name {
+                font-size: 18px;
+            }
+
+            .unit {
+                font-size: 13px;
+            }
+
+            .national-price {
+                font-size: 17px;
+            }
+
+            .national-change {
+                font-size: 13px;
+            }
+
+            .national-ratio {
+                font-size: 11px;
+            }
+
+            /* 区域数据网格 - 单列布局（关键优化点） */
+            .region-grid {
+                grid-template-columns: repeat(1, 1fr);
+                gap: 8px;
+            }
+
+            .region-item {
+                justify-content: flex-start;
+            }
+
+            .region-name {
+                font-size: 13px;
+            }
+
+            .region-price {
+                font-size: 13px;
+            }
+
+            .region-change {
+                font-size: 12px;
+            }
+
+            /* 底部区域响应式 */
+            .footer-section {
+                margin-top: 20px;
+                padding: 15px 10px;
+            }
+
+            .explanation-title,
+            .realtime-title {
+                font-size: 13px;
+            }
+
+            .explanation-text,
+            .realtime-source,
+            .description-text,
+            .publisher {
+                font-size: 11px;
+            }
+
+            .bottom-nav {
+                padding: 12px 0;
+            }
+
+            .nav-item span {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部栏模块 -->
+    <div class="header">
+        <div class="header-bar">
+            <!-- Logo区域 -->
+            <div class="header-logo">
+                <img src="out/安佑心科技LOGO.png" alt="安佑心科技LOGO">
+            </div>
+
+            <!-- 中间标题区域 -->
+            <div class="header-title">
+                <h1 class="main-title">每日行情</h1>
+                <p class="sub-title">Market Briefing</p>
+            </div>
+
+            <!-- 右侧信息区域 -->
+            <div class="header-info">
+                <p class="date-text">2026-01-14</p>
+                <p class="update-text">每日9:00自动更新</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 生猪模块 -->
+    <div class="module">
+        <div class="module-header">
+            <div class="product-info">
+                <span class="product-name">生猪</span>
+                <span class="unit">元 / 公斤</span>
+            </div>
+            <div class="national-price-row">
+                <span class="national-price">12.50</span>
+                <span class="national-change down">-0.01</span>
+                <span class="national-ratio down">(-0.08%)</span>
+            </div>
+        </div>
+        <div class="region-grid">
+            <div class="region-item"><span class="region-name">河北</span><span class="region-price">12.17</span><span class="region-change down">-0.34</span></div>
+            <div class="region-item"><span class="region-name">山东</span><span class="region-price">12.49</span><span class="region-change down">-0.14</span></div>
+            <div class="region-item"><span class="region-name">河南</span><span class="region-price">12.42</span><span class="region-change down">-0.10</span></div>
+            <div class="region-item"><span class="region-name">湖北</span><span class="region-price">12.55</span><span class="region-change up">+0.10</span></div>
+            <div class="region-item"><span class="region-name">四川</span><span class="region-price">12.80</span><span class="region-change flat">0</span></div>
+            <div class="region-item"><span class="region-name">黑龙江</span><span class="region-price">11.95</span><span class="region-change down">-0.23</span></div>
+            <div class="region-item"><span class="region-name">陕西</span><span class="region-price">12.30</span><span class="region-change down">-0.15</span></div>
+            <div class="region-item"><span class="region-name">甘肃</span><span class="region-price">12.10</span><span class="region-change down">-0.28</span></div>
+            <div class="region-item"><span class="region-name">广西</span><span class="region-price">12.90</span><span class="region-change up">+0.05</span></div>
+            <div class="region-item"><span class="region-name">广东</span><span class="region-price">13.10</span><span class="region-change up">+0.08</span></div>
+            <div class="region-item"><span class="region-name">江西</span><span class="region-price">12.65</span><span class="region-change down">-0.07</span></div>
+            <div class="region-item"><span class="region-name">福建</span><span class="region-price">12.85</span><span class="region-change up">+0.12</span></div>
+        </div>
+    </div>
+
+    <!-- 仔猪模块 -->
+    <div class="module">
+        <div class="module-header">
+            <div class="product-info">
+                <span class="product-name">仔猪</span>
+                <span class="unit">元 / 公斤</span>
+            </div>
+            <div class="national-price-row">
+                <span class="national-price">20.36</span>
+                <span class="national-change up">+0.13</span>
+                <span class="national-ratio up">(+0.64%)</span>
+            </div>
+        </div>
+        <div class="region-grid">
+            <div class="region-item"><span class="region-name">河北</span><span class="region-price">19.85</span><span class="region-change up">+0.25</span></div>
+            <div class="region-item"><span class="region-name">山东</span><span class="region-price">20.45</span><span class="region-change up">+0.18</span></div>
+            <div class="region-item"><span class="region-name">河南</span><span class="region-price">20.10</span><span class="region-change up">+0.12</span></div>
+            <div class="region-item"><span class="region-name">湖北</span><span class="region-price">20.74</span><span class="region-change up">+0.51</span></div>
+            <div class="region-item"><span class="region-name">四川</span><span class="region-price">21.05</span><span class="region-change flat">0</span></div>
+            <div class="region-item"><span class="region-name">黑龙江</span><span class="region-price">19.50</span><span class="region-change up">+0.30</span></div>
+            <div class="region-item"><span class="region-name">陕西</span><span class="region-price">20.20</span><span class="region-change up">+0.15</span></div>
+            <div class="region-item"><span class="region-name">甘肃</span><span class="region-price">19.95</span><span class="region-change up">+0.22</span></div>
+            <div class="region-item"><span class="region-name">广西</span><span class="region-price">20.90</span><span class="region-change up">+0.08</span></div>
+            <div class="region-item"><span class="region-name">广东</span><span class="region-price">21.20</span><span class="region-change down">-0.05</span></div>
+            <div class="region-item"><span class="region-name">江西</span><span class="region-price">20.65</span><span class="region-change up">+0.10</span></div>
+            <div class="region-item"><span class="region-name">福建</span><span class="region-price">20.85</span><span class="region-change up">+0.17</span></div>
+        </div>
+    </div>
+
+    <!-- 鸡蛋模块 -->
+    <div class="module">
+        <div class="module-header">
+            <div class="product-info">
+                <span class="product-name">鸡蛋</span>
+                <span class="unit">元 / 公斤</span>
+            </div>
+            <div class="national-price-row">
+                <span class="national-price">7.04</span>
+                <span class="national-change down">-0.27</span>
+                <span class="national-ratio down">(-3.69%)</span>
+            </div>
+        </div>
+        <div class="region-grid">
+            <div class="region-item"><span class="region-name">河北</span><span class="region-price">6.85</span><span class="region-change down">-0.45</span></div>
+            <div class="region-item"><span class="region-name">山东</span><span class="region-price">7.02</span><span class="region-change down">-0.28</span></div>
+            <div class="region-item"><span class="region-name">河南</span><span class="region-price">6.98</span><span class="region-change down">-0.32</span></div>
+            <div class="region-item"><span class="region-name">湖北</span><span class="region-price">7.15</span><span class="region-change down">-0.18</span></div>
+            <div class="region-item"><span class="region-name">四川</span><span class="region-price">7.25</span><span class="region-change down">-0.15</span></div>
+            <div class="region-item"><span class="region-name">黑龙江</span><span class="region-price">7.00</span><span class="region-change flat">0</span></div>
+            <div class="region-item"><span class="region-name">陕西</span><span class="region-price">6.95</span><span class="region-change down">-0.38</span></div>
+            <div class="region-item"><span class="region-name">甘肃</span><span class="region-price">6.88</span><span class="region-change down">-0.42</span></div>
+            <div class="region-item"><span class="region-name">广西</span><span class="region-price">7.18</span><span class="region-change down">-0.20</span></div>
+            <div class="region-item"><span class="region-name">广东</span><span class="region-price">7.35</span><span class="region-change down">-0.08</span></div>
+            <div class="region-item"><span class="region-name">江西</span><span class="region-price">7.10</span><span class="region-change down">-0.25</span></div>
+            <div class="region-item"><span class="region-name">福建</span><span class="region-price">7.20</span><span class="region-change down">-0.12</span></div>
+        </div>
+    </div>
+
+    <!-- 淘汰鸡模块 -->
+    <div class="module">
+        <div class="module-header">
+            <div class="product-info">
+                <span class="product-name">淘汰鸡</span>
+                <span class="unit">元 / 公斤</span>
+            </div>
+            <div class="national-price-row">
+                <span class="national-price">10.52</span>
+                <span class="national-change down">-0.45</span>
+                <span class="national-ratio down">(-4.10%)</span>
+            </div>
+        </div>
+        <div class="region-grid">
+            <div class="region-item"><span class="region-name">河北</span><span class="region-price">10.15</span><span class="region-change down">-0.55</span></div>
+            <div class="region-item"><span class="region-name">山东</span><span class="region-price">10.45</span><span class="region-change down">-0.48</span></div>
+            <div class="region-item"><span class="region-name">河南</span><span class="region-price">10.38</span><span class="region-change down">-0.52</span></div>
+            <div class="region-item"><span class="region-name">湖北</span><span class="region-price">10.68</span><span class="region-change down">-0.35</span></div>
+            <div class="region-item"><span class="region-name">四川</span><span class="region-price">10.85</span><span class="region-change down">-0.28</span></div>
+            <div class="region-item"><span class="region-name">黑龙江</span><span class="region-price">10.25</span><span class="region-change down">-0.42</span></div>
+            <div class="region-item"><span class="region-name">陕西</span><span class="region-price">10.30</span><span class="region-change down">-0.50</span></div>
+            <div class="region-item"><span class="region-name">甘肃</span><span class="region-price">10.18</span><span class="region-change down">-0.58</span></div>
+            <div class="region-item"><span class="region-name">广西</span><span class="region-price">10.75</span><span class="region-change down">-0.32</span></div>
+            <div class="region-item"><span class="region-name">广东</span><span class="region-price">10.95</span><span class="region-change down">-0.18</span></div>
+            <div class="region-item"><span class="region-name">江西</span><span class="region-price">10.62</span><span class="region-change down">-0.40</span></div>
+            <div class="region-item"><span class="region-name">福建</span><span class="region-price">10.80</span><span class="region-change down">-0.25</span></div>
+        </div>
+    </div>
+
+    <!-- 玉米模块 -->
+    <div class="module">
+        <div class="module-header">
+            <div class="product-info">
+                <span class="product-name">玉米</span>
+                <span class="unit">元 / 吨</span>
+            </div>
+            <div class="national-price-row">
+                <span class="national-price">2319</span>
+                <span class="national-change down">-5</span>
+                <span class="national-ratio down">(-0.21%)</span>
+            </div>
+        </div>
+        <div class="region-grid">
+            <div class="region-item"><span class="region-name">河北</span><span class="region-price">2295</span><span class="region-change down">-10</span></div>
+            <div class="region-item"><span class="region-name">山东</span><span class="region-price">2315</span><span class="region-change flat">0</span></div>
+            <div class="region-item"><span class="region-name">河南</span><span class="region-price">2308</span><span class="region-change down">-8</span></div>
+            <div class="region-item"><span class="region-name">湖北</span><span class="region-price">2335</span><span class="region-change down">-3</span></div>
+            <div class="region-item"><span class="region-name">四川</span><span class="region-price">2350</span><span class="region-change up">+5</span></div>
+            <div class="region-item"><span class="region-name">黑龙江</span><span class="region-price">2280</span><span class="region-change down">-12</span></div>
+            <div class="region-item"><span class="region-name">陕西</span><span class="region-price">2305</span><span class="region-change down">-7</span></div>
+            <div class="region-item"><span class="region-name">甘肃</span><span class="region-price">2290</span><span class="region-change down">-15</span></div>
+            <div class="region-item"><span class="region-name">广西</span><span class="region-price">2340</span><span class="region-change up">+2</span></div>
+            <div class="region-item"><span class="region-name">广东</span><span class="region-price">2360</span><span class="region-change up">+8</span></div>
+            <div class="region-item"><span class="region-name">江西</span><span class="region-price">2330</span><span class="region-change down">-4</span></div>
+            <div class="region-item"><span class="region-name">福建</span><span class="region-price">2345</span><span class="region-change up">+3</span></div>
+        </div>
+    </div>
+
+    <!-- 豆粕模块 -->
+    <div class="module">
+        <div class="module-header">
+            <div class="product-info">
+                <span class="product-name">豆粕</span>
+                <span class="unit">元 / 吨</span>
+            </div>
+            <div class="national-price-row">
+                <span class="national-price">3245</span>
+                <span class="national-change down">-15</span>
+                <span class="national-ratio down">(-0.46%)</span>
+            </div>
+        </div>
+        <div class="region-grid">
+            <div class="region-item"><span class="region-name">河北</span><span class="region-price">3220</span><span class="region-change down">-18</span></div>
+            <div class="region-item"><span class="region-name">山东</span><span class="region-price">3240</span><span class="region-change down">-12</span></div>
+            <div class="region-item"><span class="region-name">河南</span><span class="region-price">3235</span><span class="region-change down">-14</span></div>
+            <div class="region-item"><span class="region-name">湖北</span><span class="region-price">3260</span><span class="region-change down">-10</span></div>
+            <div class="region-item"><span class="region-name">四川</span><span class="region-price">3275</span><span class="region-change down">-8</span></div>
+            <div class="region-item"><span class="region-name">黑龙江</span><span class="region-price">3205</span><span class="region-change down">-22</span></div>
+            <div class="region-item"><span class="region-name">陕西</span><span class="region-price">3230</span><span class="region-change down">-16</span></div>
+            <div class="region-item"><span class="region-name">甘肃</span><span class="region-price">3215</span><span class="region-change down">-20</span></div>
+            <div class="region-item"><span class="region-name">广西</span><span class="region-price">3265</span><span class="region-change down">-9</span></div>
+            <div class="region-item"><span class="region-name">广东</span><span class="region-price">3285</span><span class="region-change down">-5</span></div>
+            <div class="region-item"><span class="region-name">江西</span><span class="region-price">3255</span><span class="region-change down">-11</span></div>
+            <div class="region-item"><span class="region-name">福建</span><span class="region-price">3270</span><span class="region-change down">-7</span></div>
+        </div>
+    </div>
+
+    <!-- 底部说明区域 -->
+    <div class="footer-section">
+        <!-- 数据说明 -->
+        <div class="data-explanation">
+            <div class="explanation-title">数据说明</div>
+            <div class="explanation-text">数据来源于博亚和讯、猪好多网、玄田数据等专业畜牧网站，通过联网搜索实时获取。价格仅供参考，实际交易请以当地市场为准。</div>
+            <div class="explanation-text">更新规则：每日上午9:00自动更新当天数据。9:00之前显示前一天数据，9:00之后显示当天数据。</div>
+        </div>
+
+        <!-- 实时数据 -->
+        <div class="realtime-data">
+            <div class="realtime-title">实时数据：数据来源</div>
+            <div class="realtime-source">三大网站综合搜索</div>
+        </div>
+
+        <!-- 平台描述 -->
+        <div class="platform-description">
+            <div class="description-text">专业化、自动化、可视化的畜牧饲料原料市场行情信息平台，旨在为畜牧养殖户、饲料生产企业从业者、行业分析师等用户提供实时、准确的市场行情数据和服务。安佑集团预混料事业部市场部发布。</div>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <span>每日行情</span>
+        </div>
+        <div class="nav-item">
+            <span>每周周报</span>
+        </div>
+        <div class="nav-item">
+            <span>我的</span>
+        </div>
+    </div>
+
+    <!-- 自动加载数据的JavaScript代码 -->
+    <script>
+    (function() {
+        // 配置：GitHub用户名（请修改为你的GitHub用户名）
+        const GITHUB_USERNAME = 'rexlhb';
+        const REPO_NAME = 'anyu-market-data';
+
+        // 产品价格映射（从JSON中的产品名到HTML中的数据属性）
+        const productMap = {
+            '生猪': { selector: '.product-name' },
+            '仔猪': { selector: '.product-name' },
+            '鸡蛋': { selector: '.product-name' },
+            '淘汰鸡': { selector: '.product-name' },
+            '玉米': { selector: '.product-name' },
+            '豆粕': { selector: '.product-name' }
+        };
+
+        // 从GitHub加载JSON数据
+        async function loadMarketData() {
+            try {
+                const url = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/backend/market_data.json`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    console.error('加载数据失败:', response.status);
+                    return;
+                }
+
+                const data = await response.json();
+                updatePrices(data);
+                updateLastUpdated(data.date);
+
+            } catch (error) {
+                console.error('加载数据出错:', error);
+            }
+        }
+
+        // 更新页面上的价格数据
+        function updatePrices(data) {
+            const products = data.products;
+
+            // 遍历所有产品模块
+            document.querySelectorAll('.module').forEach(module => {
+                const productName = module.querySelector('.product-name')?.textContent.trim();
+
+                if (productName && products[productName]) {
+                    const price = products[productName].price;
+
+                    if (price) {
+                        // 更新全国价格
+                        const priceElement = module.querySelector('.national-price');
+                        if (priceElement) {
+                            priceElement.textContent = formatPrice(productName, price);
+                        }
+
+                        // 添加数据来源提示
+                        const sources = products[productName].sources || [];
+                        if (sources.length > 0) {
+                            const sourceNames = sources.map(s => s.source).join(', ');
+                            addSourceTooltip(module, productName, price, sourceNames);
+                        }
+                    }
+                }
+            });
+        }
+
+        // 格式化价格（根据产品类型决定小数位数）
+        function formatPrice(productName, price) {
+            // 生猪、仔猪、鸡蛋、淘汰鸡保留2位小数
+            // 玉米、豆粕保留整数
+            const decimalProducts = ['生猪', '仔猪', '鸡蛋', '淘汰鸡'];
+            const integerProducts = ['玉米', '豆粕'];
+
+            if (decimalProducts.includes(productName)) {
+                return price.toFixed(2);
+            } else if (integerProducts.includes(productName)) {
+                return Math.round(price).toString();
+            } else {
+                return price.toString();
+            }
+        }
+
+        // 更新最后更新时间
+        function updateLastUpdated(date) {
+            const dateElements = document.querySelectorAll('.update-text');
+            dateElements.forEach(el => {
+                el.textContent = '最后更新: ' + date;
+            });
+        }
+
+        // 添加数据来源提示
+        function addSourceTooltip(module, productName, price, sources) {
+            // 可以在这里添加更多交互功能，比如点击显示数据来源
+            console.log(`${productName}: ${price} (来源: ${sources})`);
+        }
+
+        // 页面加载完成后自动运行
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadMarketData);
+        } else {
+            loadMarketData();
+        }
+
+        console.log('数据加载功能已启用');
+    })();
+    </script>
+</body>
+</html>
