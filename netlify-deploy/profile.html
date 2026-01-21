@@ -404,7 +404,7 @@
         // 从GitHub获取周报索引
         async function fetchWeeklyReportIndex() {
             try {
-                const url = `https://raw.githubusercontent.com/${rexlhb}/${REPO_NAME}/main/backend/weekly_report_index.json`;
+                const url = `https://cdn.jsdelivr.net/gh/${GITHUB_USERNAME}/${REPO_NAME}@main/backend/weekly_report_index.json`;
                 const response = await fetch(url);
 
                 if (!response.ok) {
@@ -423,7 +423,7 @@
         // 下载文档（从GitHub下载）
         async function downloadDocument(githubPath, filename) {
             try {
-                const url = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/${githubPath}`;
+                const url = `https://cdn.jsdelivr.net/gh/${GITHUB_USERNAME}/${REPO_NAME}@main/backend/weekly_report_index.json`;
                 const response = await fetch(url);
 
                 if (!response.ok) {
