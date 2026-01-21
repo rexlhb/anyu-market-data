@@ -659,7 +659,7 @@
         // 从GitHub加载JSON数据
         async function loadMarketData() {
             try {
-                const url = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/backend/market_data.json`;
+                const url = `https://cdn.jsdelivr.net/gh/${GITHUB_USERNAME}/${REPO_NAME}@main/backend/market_data.json`;
                 const response = await fetch(url);
 
                 if (!response.ok) {
