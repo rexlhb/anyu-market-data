@@ -487,7 +487,7 @@
         // 从GitHub获取历史数据
         async function fetchMarketHistory() {
             try {
-                const url = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/backend/market_history.json`;
+                const url = `https://cdn.jsdelivr.net/gh/${GITHUB_USERNAME}/${REPO_NAME}@main/backend/weekly_report_index.json`;
                 const response = await fetch(url);
 
                 if (!response.ok) {
