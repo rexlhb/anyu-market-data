@@ -479,4 +479,205 @@
         </div>
     </div>
 </body>
+        <script>
+        // 配置：GitHub用户名
+        const GITHUB_USERNAME = 'rexlhb';
+        const REPO_NAME = 'anyu-market-data';
+
+        // 从GitHub获取历史数据
+        async function fetchMarketHistory() {
+            try {
+                const url = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/backend/market_history.json`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    console.warn('未找到历史数据文件');
+                    return null;
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('获取历史数据失败:', error);
+                return null;
+            }
+        }
+
+        // 计算周均价和涨跌
+        function calculateWeeklyData(history, weekStart, weekEnd, lastWeekStart, lastWeekEnd) {
+            const products = ['生猪', '仔猪', '鸡蛋', '淘汰鸡', '玉米', '豆粕'];
+            const currentWeekData = {};
+            const lastWeekData = {};
+            const changes = {};
+
+            // 获取本周数据
+            const current = new Date(weekStart);
+            while (current <= new Date(weekEnd)) {
+                const dateStr = current.toISOString().split('T')[0];
+                if (history[dateStr] && history[dateStr].products) {
+                    for (const product of products) {
+                        if (!currentWeekData[product]) {
+                            currentWeekData[product] = [];
+                        }
+                        const price = history[dateStr].products[product]?.price;
+                        if (price !== null && price !== undefined) {
+                            currentWeekData[product].push(price);
+                        }
+                    }
+                }
+ current.setDate(current.getDate() + 1);
+            }
+
+            // 获取上周数据
+            const last = new Date(lastWeekStart);
+            while (last <= new Date(lastWeekEnd)) {
+                const dateStr = last.toISOString().split('T')[0];
+                if (history[dateStr] && history[dateStr].products) {
+                    for (const product of products) {
+                        if (!lastWeekData[product]) {
+                            lastWeekData[product] = [];
+                        }
+                        const price = history[dateStr].products[product]?.price;
+                        if (price !== null && price !== undefined) {
+                            lastWeekData[product].push(price);
+                                           }
+                }
+                last.setDate(last.getDate() + 1);
+            }
+
+            // 计算平均值和涨跌
+            for (const product of products) {
+                const currentAvg = currentWeekData[product].length > 0
+                    ? currentWeekData[product].reduce((a, b) => a + b, 0) / currentWeekData[product].length
+                    : null;
+                const lastAvg = lastWeekData[product].length > 0
+                    ? lastWeekData[product].reduce((a, b) => a + b, 0) / lastWeekData[product].length
+                    : null;
+
+                if (currentAvg !== null && lastAvg !== null) {
+                    changes[product] = {
+                        price: currentAvg,
+                        change: currentAvg - lastAvg,
+                        percent: ((current - lastAvg) / lastAvg) * 100
+                    };
+                } else {
+                    changes[product] = null;
+                }
+            }
+
+            return changes;
+        }
+
+        // 格式化价格
+        function formatPrice(product, price) {
+            if (price === null) return '无数据';
+
+            decimalProducts = ['生猪', '仔猪', '鸡蛋', '淘汰鸡'];
+            const integerProducts = ['玉米', '豆粕'];
+
+            if (decimalProducts.includes(product)) {
+                return price.toFixed(2);
+            } else if (integerProducts.includes(product)) {
+                return Math.round(price);
+            } else {
+                return price.toFixed(2);
+            }
+        }
+
+        // 格式化涨跌
+        function formatChange(product, change, percent) {
+            if (change === null) return { change: '无数据', percent: '无数据', class: 'flat' };
+
+            const decimalProducts = ['生猪', '仔猪', '鸡蛋', '淘汰鸡'];
+            const changeStr = change > 0
+                ? `+${decimalProducts.includes(product) ? change.toFixed(2) : Math.round(change)}`
+                : (decimalProducts.includes(product) ? change.toFixed(2) : Math.round(change));
+            const percentStr = percent > 0
+                ? `(+${percent.toFixed(2)}%)`
+                : `(${percent.toFixed(2)}%)`;
+            const classStr = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
+
+            return { change: changeStr, percent: percentStr, class: classStr };
+        }
+
+        // 更新页面数据
+        function updatePageData(weeklyData, weekStart, weekEnd) {
+            // 更新顶部日期
+            const dateText = document.querySelector('.date-text');
+            if (dateText) {
+                dateText.textContent = weekStart;
+            }
+
+            // 更新各品类数据
+            const products = ['生猪', '仔猪', '鸡蛋', '淘汰鸡', '玉米', '豆粕'];
+            const cards = document.querySelectorAll('.data-card');
+
+            products.forEach((product, index) => {
+                const card = cards[index];
+                if (!card || !weeklyData[]) return;
+
+                const data = weeklyData[product];
+                const priceValue = card.querySelector('.price-value');
+                const priceChange = card.querySelector('.price-change');
+                const priceRatio = card.querySelector('.price-ratio');
+
+                // 更新价格
+                if (priceValue) {
+                    priceValue.textContent = formatPrice(product, data.price);
+                }
+
+                // 更新涨跌
+                if (priceChange && priceRatio) {
+                    const change = formatChange(product, data.change, data.percent);
+                    priceChange.textContent = change.change;
+                    priceChange.className = `price-change ${change.class}`;
+                    priceRatio.textContent = change.percent;
+                    priceRatio.className = `price-ratio ${change.class}`;
+                }
+            });
+        }
+
+        // 获取本周和上周日期范围
+        function getWeekRanges() {
+            const today = new Date();
+            const day = today.getDay();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            const lastWeekSunday = new Date(monday);
+            lastWeekSunday.setDate(monday.getDate() - 1);
+            const lastWeekMonday = new Date(lastWeekSunday);
+            lastWeekMonday.setDate(lastWeekSunday.getDate() - 6);
+
+            return {
+                weekStart: monday.toISOString().split('T')[0],
+                weekEnd: sunday.toISOString().split('T')[0],
+                lastWeekStart: lastWeekMonday.toISOString().split('T')[0],
+                lastWeekEnd: lastWeekSunday.toISOString().split('T')[0]
+            };
+        }
+
+        // 初始化页面
+        async function initPage() {
+            console.log('开始加载周报数据...');
+
+            const ranges = getWeekRanges();
+            const history = await fetchMarketHistory();
+
+            if (!history || Object.keys(history).length === 0) {
+                console.warn('无法加载历史数据，使用示例数据');
+                return;
+            }
+
+            const weeklyData = calculateWeeklyData(
+                history,
+                ranges.weekStart,
+                ranges.weekEnd,
+                ranges.lastWeekStart,
+                ranges.lastWeekEnd
+            );
+
+            updatePageData(weeklyData, ranges.weekSt
 </html>
