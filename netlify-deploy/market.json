@@ -1,0 +1,135 @@
+{
+  "update_date": "2026-01-23",
+  "update_time": "09:54",
+  "data_source": [
+    "博亚和讯"
+  ],
+  "products": {
+    "pig": {
+      "name": "生猪",
+      "unit": "元/公斤",
+      "national_price": 13.18,
+      "national_change": -0.05,
+      "national_change_ratio": -0.38,
+      "regions": {
+        "河北": {"price": 13.33, "change": 0.05},
+        "山东": {"price": 13.17, "change": -0.05},
+        "河南": {"price": 13.18, "change": 0.10},
+        "湖北": {"price": 13.00, "change": 0.10},
+        "四川": {"price": 13.00, "change": 0.00},
+        "黑龙江": {"price": 12.93, "change": 0.20},
+        "陕西": {"price": 13.10, "change": 0.00},
+        "甘肃": {"price": 12.90, "change": 0.00},
+        "广西": {"price": 13.00, "change": 0.00},
+        "广东": {"price": 13.56, "change": -0.25},
+        "江西": {"price": 12.90, "change": -0.25},
+        "福建": {"price": 13.03, "change": -0.20}
+      }
+    },
+    "piglet": {
+      "name": "仔猪",
+      "unit": "元/公斤",
+      "national_price": 26.50,
+      "national_change": 0.38,
+      "national_change_ratio": 1.45,
+      "regions": {
+        "河北": {"price": 26.80, "change": 0.00},
+        "山东": {"price": 27.30, "change": 0.50},
+        "河南": {"price": 27.05, "change": 0.40},
+        "湖北": {"price": 27.25, "change": 0.45},
+        "四川": {"price": 26.50, "change": 0.00},
+        "黑龙江": {"price": 25.90, "change": 0.50},
+        "陕西": {"price": 26.50, "change": 0.00},
+        "甘肃": {"price": 26.20, "change": 0.00},
+        "广西": {"price": 26.50, "change": 0.00},
+        "广东": {"price": 27.85, "change": 0.55},
+        "江西": {"price": 26.55, "change": 0.00},
+        "福建": {"price": 27.25, "change": 0.45}
+      }
+    },
+    "egg": {
+      "name": "鸡蛋",
+      "unit": "元/斤",
+      "national_price": 3.93,
+      "national_change": 0.11,
+      "national_change_ratio": 2.87,
+      "regions": {
+        "河北": {"price": 3.56, "change": 0.11},
+        "山东": {"price": 3.91, "change": 0.11},
+        "河南": {"price": 4.00, "change": 0.10},
+        "湖北": {"price": 3.80, "change": 0.13},
+        "四川": {"price": 3.80, "change": 0.20},
+        "黑龙江": {"price": 3.60, "change": 0.10},
+        "陕西": {"price": 4.20, "change": 0.10},
+        "甘肃": {"price": 4.00, "change": 0.10},
+        "广西": {"price": 4.07, "change": 0.16},
+        "广东": {"price": 4.10, "change": 0.10},
+        "江西": {"price": 3.80, "change": 0.13},
+        "福建": {"price": 4.30, "change": 0.20}
+      }
+    },
+    "hen": {
+      "name": "淘汰鸡",
+      "unit": "元/斤",
+      "national_price": 4.65,
+      "national_change": 0.05,
+      "national_change_ratio": 1.09,
+      "regions": {
+        "河北": {"price": 4.30, "change": 0.10},
+        "山东": {"price": 4.60, "change": 0.00},
+        "河南": {"price": 4.60, "change": 0.00},
+        "湖北": {"price": 4.20, "change": 0.00},
+        "四川": {"price": 4.00, "change": 0.00},
+        "黑龙江": {"price": 4.60, "change": 0.00},
+        "陕西": {"price": 4.40, "change": 0.00},
+        "甘肃": {"price": 4.10, "change": 0.00},
+        "广西": {"price": 4.10, "change": 0.00},
+        "广东": {"price": 4.10, "change": 0.00},
+        "江西": {"price": 4.10, "change": 0.00},
+        "福建": {"price": 4.10, "change": 0.00}
+      }
+    },
+    "corn": {
+      "name": "玉米",
+      "unit": "元/吨",
+      "national_price": 2350,
+      "national_change": 0,
+      "national_change_ratio": 0.00,
+      "regions": {
+        "河北": {"price": 2380, "change": 0},
+        "山东": {"price": 2380, "change": 0},
+        "河南": {"price": 2350, "change": 0},
+        "湖北": {"price": 2320, "change": 0},
+        "四川": {"price": 2440, "change": 0},
+        "黑龙江": {"price": 2270, "change": 0},
+        "陕西": {"price": 2350, "change": 0},
+        "甘肃": {"price": 2350, "change": 0},
+        "广西": {"price": 2450, "change": 0},
+        "广东": {"price": 2430, "change": 0},
+        "江西": {"price": 2330, "change": 0},
+        "福建": {"price": 2350, "change": 0}
+      }
+    },
+    "soybean": {
+      "name": "豆粕",
+      "unit": "元/吨",
+      "national_price": 3170,
+      "national_change": 10,
+      "national_change_ratio": 0.32,
+      "regions": {
+        "河北": {"price": 3180, "change": 10},
+        "山东": {"price": 3120, "change": 10},
+        "河南": {"price": 3150, "change": 10},
+        "湖北": {"price": 3070, "change": 10},
+        "四川": {"price": 3140, "change": 0},
+        "黑龙江": {"price": 3280, "change": 0},
+        "陕西": {"price": 3150, "change": 0},
+        "甘肃": {"price": 3140, "change": 0},
+        "广西": {"price": 3140, "change": 10},
+        "广东": {"price": 3090, "change": 10},
+        "江西": {"price": 3080, "change": 10},
+        "福建": {"price": 3150, "change": 10}
+      }
+    }
+  }
+}
