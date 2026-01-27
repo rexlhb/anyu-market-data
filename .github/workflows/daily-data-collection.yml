@@ -14,11 +14,11 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests coze-coding-dev-sdk
-      - run: cd backend && python data_collector.py
+      - run: cd backend && python data_collector_v2.py
       - run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add backend/market_data.json backend/market_data.html
+          git add market.json
           git diff --quiet && git diff --staged --quiet || git commit -m "Auto update market data"
       - uses: ad-m/github-push-action@master
         with:
