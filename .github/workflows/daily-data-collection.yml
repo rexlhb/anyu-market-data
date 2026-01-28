@@ -21,8 +21,9 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           git add market.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto update market data"
-      - run: |
-          git push origin HEAD:main --force
+          if ! git diff --quiet && ! git diff --staged --quiet; then
+            git commit -m "Auto update market data"
+            git push origin HEAD:main --force
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
