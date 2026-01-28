@@ -196,7 +196,7 @@ def extract_price_from_text(text: str, product_name: str) -> Optional[float]:
             pass
 
     return None
-  def collect_national_price(product_key: str, product_name: str) -> Optional[float]:
+def collect_national_price(product_key: str, product_name: str) -> Optional[float]:
     """
     采集全国均价
     """
