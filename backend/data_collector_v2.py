@@ -337,6 +337,7 @@ def main():
     """
     主函数
     """
+    print("脚本开始运行！！！")
     print("=" * 60)
     print("开始采集市场行情数据（完整版）")
     print(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -453,4 +454,5 @@ def main():
     for product_key, product_data in market_data['products'].items():
         print(f"  {product_data['name']}: {product_data['national_price']} {product_data['unit']} "
                         f"({product_data['national_change']:+.2f}, {product_data['national_change_ratio']:+.2f}%)")
+
 
