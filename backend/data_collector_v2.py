@@ -1,3 +1,5 @@
+import requests
+from bs4 import BeautifulSoup
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -147,22 +149,48 @@ PROVINCE_VARIATIONS = {
 }
 
 
+import requests
+from bs4 import BeautifulSoup
+
 def search_web(query: str) -> List[str]:
     """
-    使用联网搜索功能搜索数据
-    返回搜索结果的文本内容
+    访问博亚和讯网站获取数据
     """
     try:
-        cmd = ['coze-coding-ai', 'search', '--query', query, '--count', '3']
-        result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8')
-
-        if result.returncode != 0:
+        # 博亚和讯每日行情页面
+        url = 'https://www.boyar.cn/MarketDaily.aspx'
+        
+        # 设置请求头，模拟浏览器访问
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        # 发送 HTTP 请求
+        response = requests.get(url, headers=headers, timeout=10)
+        response.encoding = 'utf-8'
+        
+        if response.status_code != 200:
+            print(f"访问失败，状态码: {response.status_code}")
             return []
-
-        # 返回所有文本内容
-        return result.stdout.strip().split('\n')
+        
+        # 解析 HTML
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # 提取页面上的价格数据
+        # 这里需要根据实际页面结构调整
+        data_rows = soup.find_all('tr')  # 查找所有表格行
+        
+        results = []
+        for row in data_rows:
+            # 提取行中的文本内容
+            cells = row.find_all(['td', 'th'])
+            row_text = ' '.join([cell.get_text(strip=True) for cell in cells])
+            results.append(row_text)
+        
+        return results
+        
     except Exception as e:
-        print(f"搜索出错: {e}")
+        print(f"获取数据出错: {e}")
         return []
 
 
@@ -198,28 +226,49 @@ def extract_price_from_text(text: str, product_name: str) -> Optional[float]:
     return None
 def collect_national_price(product_key: str, product_name: str) -> Optional[float]:
     """
-    采集全国均价
+    从博亚和讯网站采集全国均价
     """
     print(f"  正在采集{product_name}全国均价...")
-
-    # 尝试多个搜索词
-    search_terms = [
-        f'{product_name}价格',
-        f'{product_name}均价',
-        f'{product_name}全国价格'
-    ]
-
-    for term in search_terms:
-        results = search_web(term)
-
-        for result in results:
-            price = extract_price_from_text(result, product_name)
-            if price:
+    
+    try:
+        # 访问博亚和讯
+        url = 'https://www.boyar.cn/MarketDaily.aspx'
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        response = requests.get(url, headers=headers, timeout=10)
+        response.encoding = 'utf-8'
+        
+        if response.status_code != 200:
+            print(f"    ⚠ 访问失败，状态码: {response.status_code}")
+            return None
+        
+        # 解析 HTML
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # 查找包含产品名称的表格行
+        all_text = soup.get_text()
+        
+        # 在页面文本中查找产品价格
+        patterns = [
+            rf'{product_name}[均价]*\s*[为是]*\s*([0-9]+\.[0-9]+|[0-9]+)',
+            rf'{product_name}\s*([0-9]+\.[0-9]+|[0-9]+)\s*元'
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, all_text, re.IGNORECASE)
+            if match:
+                price = float(match.group(1))
                 print(f"    ✓ 找到价格: {price}")
                 return price
-
-    print(f"    ⚠ 未找到{product_name}价格")
-    return None
+        
+        print(f"    ⚠ 未找到{product_name}价格")
+        return None
+        
+    except Exception as e:
+        print(f"    ⚠ 采集出错: {e}")
+        return None
 
 
 def generate_province_prices(national_price: float, product_key: str) -> Dict[str, Dict[str, float]]:
