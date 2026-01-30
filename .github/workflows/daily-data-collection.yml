@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests beautifulsoup4
-      - run: cd backend && python data_collector_v2.py
+      - run: cd backend && python -u data_collector_v2.py
         shell: bash
       - run: |
           git config --local user.email "action@github.com"
