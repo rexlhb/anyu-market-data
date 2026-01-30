@@ -1,5 +1,3 @@
-import requests
-from bs4 import BeautifulSoup
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -13,6 +11,8 @@ import subprocess
 import random
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
+import requests
+from bs4 import BeautifulSoup
 
 # 配置参数
 PRODUCTS = {
@@ -149,9 +149,6 @@ PROVINCE_VARIATIONS = {
 }
 
 
-import requests
-from bs4 import BeautifulSoup
-
 def search_web(query: str) -> List[str]:
     """
     访问博亚和讯网站获取数据
@@ -224,6 +221,8 @@ def extract_price_from_text(text: str, product_name: str) -> Optional[float]:
             pass
 
     return None
+
+
 def collect_national_price(product_key: str, product_name: str) -> Optional[float]:
     """
     从博亚和讯网站采集全国均价
@@ -453,13 +452,4 @@ def main():
     print("\n各产品数据:")
     for product_key, product_data in market_data['products'].items():
         print(f"  {product_data['name']}: {product_data['national_price']} {product_data['unit']} "
-              f"({product_data['national_change']:+.2f}, {product_data['national_change_ratio']:+.2f}%)")
-
-    print("=" * 60)
-    print("✓ 所有数据采集完成！")
-
-
-if __name__ == "__main__":
-    # 固定随机种子，确保数据稳定
-    random.seed(42)
-    main()
+              f"({product_data['national_change']:+.2f}, {product_data['national_change
