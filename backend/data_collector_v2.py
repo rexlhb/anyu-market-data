@@ -452,4 +452,5 @@ def main():
     print("\n各产品数据:")
     for product_key, product_data in market_data['products'].items():
         print(f"  {product_data['name']}: {product_data['national_price']} {product_data['unit']} "
-              f"({product_data['national_change']:+.2f}, {product_data['national_change
+                        f"({product_data['national_change']:+.2f}, {product_data['national_change_ratio']:+.2f}%)")
+
