@@ -225,49 +225,76 @@ def extract_price_from_text(text: str, product_name: str) -> Optional[float]:
 
 def collect_national_price(product_key: str, product_name: str) -> Optional[float]:
     """
-    从博亚和讯网站采集全国均价
+    从多个数据源采集全国均价
     """
     print(f"  正在采集{product_name}全国均价...")
     
-    try:
-        # 访问博亚和讯
-        url = 'https://www.boyar.cn/MarketDaily.aspx'
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    # 定义多个数据源
+    data_sources = [
+        {
+            'name': '猪好多网',
+            'url': f'https://www.zhuhaoda.com/api/price/{product_key}',
+            'parser': 'json'
+        },
+        {
+            'name': '中国养猪网',
+            'url': f'https://www.zhuwang.cc/price/{product_key}',
+            'parser': 'html'
+        },
+        {
+            'name': '博亚和讯',
+            'url': 'https://www.boyar.cn/MarketDaily.aspx',
+            'parser': 'html'
         }
-        
-        response = requests.get(url, headers=headers, timeout=10)
-        response.encoding = 'utf-8'
-        
-        if response.status_code != 200:
-            print(f"    ⚠ 访问失败，状态码: {response.status_code}")
-            return None
-        
-        # 解析 HTML
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # 查找包含产品名称的表格行
-        all_text = soup.get_text()
-        
-        # 在页面文本中查找产品价格
-        patterns = [
-            rf'{product_name}[均价]*\s*[为是]*\s*([0-9]+\.[0-9]+|[0-9]+)',
-            rf'{product_name}\s*([0-9]+\.[0-9]+|[0-9]+)\s*元'
-        ]
-        
-        for pattern in patterns:
-            match = re.search(pattern, all_text, re.IGNORECASE)
-            if match:
-                price = float(match.group(1))
-                print(f"    ✓ 找到价格: {price}")
-                return price
-        
-        print(f"    ⚠ 未找到{product_name}价格")
-        return None
-        
-    except Exception as e:
-        print(f"    ⚠ 采集出错: {e}")
-        return None
+    ]
+    
+    for source in data_sources:
+        try:
+            print(f"    尝试访问{source['name']}...")
+            
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+            
+            response = requests.get(source['url'], headers=headers, timeout=10)
+            response.encoding = 'utf-8'
+            
+            if response.status_code != 200:
+                print(f"      ⚠ 访问失败，状态码: {response.status_code}")
+                continue
+            
+            if source['parser'] == 'json':
+                # JSON 解析
+                data = response.json()
+                if 'price' in data:
+                    price = float(data['price'])
+                    print(f"    ✓ 从{source['name']}找到价格: {price}")
+                    return price
+            else:
+                # HTML 解析
+                soup = BeautifulSoup(response.text, 'html.parser')
+                all_text = soup.get_text()
+                
+                patterns = [
+                    rf'{product_name}[均价]*\s*[为是]*\s*([0-9]+\.[0-9]+|[0-9]+)',
+                    rf'{product_name}\s*([0-9]+\.[0-9]+|[0-9]+)\s*元'
+                ]
+                
+                for pattern in patterns:
+                    match = re.search(pattern, all_text, re.IGNORECASE)
+                    if match:
+                        price = float(match.group(1))
+                        print(f"    ✓ 从{source['name']}找到价格: {price}")
+                        return price
+            
+            print(f"      ⚠ {source['name']}未找到价格")
+            
+        except Exception as e:
+            print(f"      ⚠ 访问{source['name']}出错: {e}")
+            continue
+    
+    print(f"    ⚠ 所有数据源都未找到{product_name}价格")
+    return None
 
 
 def generate_province_prices(national_price: float, product_key: str) -> Dict[str, Dict[str, float]]:
@@ -462,6 +489,7 @@ if __name__ == "__main__":
     # 固定随机种子，确保数据稳定
     random.seed(42)
     main()
+
 
 
 
