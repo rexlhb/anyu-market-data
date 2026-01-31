@@ -454,5 +454,15 @@ def main():
     for product_key, product_data in market_data['products'].items():
         print(f"  {product_data['name']}: {product_data['national_price']} {product_data['unit']} "
                         f"({product_data['national_change']:+.2f}, {product_data['national_change_ratio']:+.2f}%)")
+        
+   print("=" * 60)
+   print("✓ 所有数据采集完成！")
+
+
+   if __name__ == "__main__":
+       # 固定随机种子，确保数据稳定
+       random.seed(42)
+       main()
+
 
 
