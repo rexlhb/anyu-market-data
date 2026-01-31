@@ -240,7 +240,7 @@ def collect_national_price(product_key: str, product_name: str) -> Optional[floa
         for term in search_terms:
             print(f"    搜索: {term}")
             
-            cmd = ['coze-coding-ai', 'search', '--query', term, '--count', '5']
+            cmd = ['coze-coding-ai', 'search', '--count', '5', term]
             result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8')
             
             if result.returncode != 0:
@@ -471,6 +471,7 @@ if __name__ == "__main__":
     # 固定随机种子，确保数据稳定
     random.seed(42)
     main()
+
 
 
 
