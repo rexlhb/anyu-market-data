@@ -244,7 +244,8 @@ def collect_national_price(product_key: str, product_name: str) -> Optional[floa
             result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8')
             
             if result.returncode != 0:
-                print(f"      ⚠ 搜索失败")
+                print(f"      ⚠ 搜索失败，返回码: {result.returncode}")
+                print(f"      错误输出: {result.stderr}")
                 continue
             
             # 从搜索结果中提取价格
@@ -470,6 +471,7 @@ if __name__ == "__main__":
     # 固定随机种子，确保数据稳定
     random.seed(42)
     main()
+
 
 
 
