@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import requests
 from bs4 import BeautifulSoup
+from coze_coding_dev_sdk import SearchClient, Config
 
 # 配置参数
 PRODUCTS = {
@@ -223,9 +224,9 @@ def extract_price_from_text(text: str, product_name: str) -> Optional[float]:
     return None
 
 
-def collect_national_price(product_key: str, product_name: str) -> Optional[float]:
+al_price(product_key: str, product_name: str) -> Optional[float]:
     """
-    使用 coze-coding-ai 联网搜索采集全国均价
+    使用 coze-coding-dev-sdk 联网搜索采集全国均价
     """
     print(f"  正在采集{product_name}全国均价...")
     
@@ -237,41 +238,42 @@ def collect_national_price(product_key: str, product_name: str) -> Optional[floa
             f'{product_name}全国价格'
         ]
         
+        config = Config()
+        client = SearchClient(config)
+        
         for term in search_terms:
             print(f"    搜索: {term}")
             
-            cmd = ['coze-coding-ai', 'search', '--count', '5', term]
-            result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8')
-            
-            if result.returncode != 0:
-                print(f"      ⚠ 搜索失败，返回码: {result.returncode}")
-                print(f"      错误输出: {result.stderr}")
+            try:
+                response = client.webSearch(term, count=5)
+                
+                if response.web_items and len(response.web_items) > 0:
+                    # 从搜索结果中提取价格
+                    output = '\n'.join([item.snippet + ' ' + (item.summary or '') for item in response.web_items])
+                    
+                    # 使用正则表达式匹配价格
+                    price_patterns = [
+                        rf'{product_name}.*?([0-9]+\.[0-9]+|[0-9]+)\s*元',
+                        rf'([0-9]+\.[0-9]+|[0-9]+)\s*元[/公斤千克吨斤kgkg]',
+                        rf'集港价格\s*([0-9]+\.[0-9]+|[0-9]+)\s*元/吨'
+                    ]
+                    
+                    for pattern in price_patterns:
+                        match = re.search(pattern, output, re.IGNORECASE)
+                        if match:
+                            price = float(match.group(1))
+                            print(f"    ✓ 找到价格: {price}")
+                            return price
+                
+            except Exception as e:
+                print(f"      ⚠ 搜索出错: {e}")
                 continue
-            
-            # 从搜索结果中提取价格
-            output = result.stdout
-            
-            # 使用正则表达式匹配价格
-            price_patterns = [
-                rf'{product_name}.*?([0-9]+\.[0-9]+|[0-9]+)\s*元',
-                rf'([0-9]+\.[0-9]+|[0-9]+)\s*元[/公斤千克吨斤kgkg].*?{product_name}',
-                rf'集港价格\s*([0-9]+\.[0-9]+|[0-9]+)\s*元/吨'
-            ]
-            
-            for pattern in price_patterns:
-                match = re.search(pattern, output, re.IGNORECASE)
-                if match:
-                    price = float(match.group(1))
-                    
-                    # 根据产品单位调整价格
-                    if product_key == 'corn' or product_key == 'soybean':
-                        # 玉米和豆粕的单位是元/吨，需要进一步检查
-                        pass
-                    
-                    print(f"    ✓ 找到价格: {price}")
-                    return price
         
         print(f"    ⚠ 未找到{product_name}价格")
+        return None
+        
+    except Exception as e:
+        print(f"    ⚠ 采集出错: {e}")
         return None
         
     except Exception as e:
@@ -471,6 +473,7 @@ if __name__ == "__main__":
     # 固定随机种子，确保数据稳定
     random.seed(42)
     main()
+
 
 
 
