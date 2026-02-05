@@ -224,7 +224,7 @@ def extract_price_from_text(text: str, product_name: str) -> Optional[float]:
     return None
 
 
-al_price(product_key: str, product_name: str) -> Optional[float]:
+def collect_national_price(product_key: str, product_name: str) -> Optional[float]:
     """
     使用 coze-coding-dev-sdk 联网搜索采集全国均价
     """
@@ -473,6 +473,7 @@ if __name__ == "__main__":
     # 固定随机种子，确保数据稳定
     random.seed(42)
     main()
+
 
 
 
